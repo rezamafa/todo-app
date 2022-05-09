@@ -1,0 +1,1 @@
+export type apiResponse = { Success: boolean, Data?: any, Errors?: string[] }
