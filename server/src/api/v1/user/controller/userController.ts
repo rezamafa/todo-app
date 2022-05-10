@@ -1,17 +1,16 @@
 import express from "express";
 import Repository from '../repository/UserReposirory';
-import {apiResponse} from '../../../models/models';
-import {UserInterface, userRole, userState} from '../../../interfaces/user';
+import {apiResponse} from '../../../models/expressModels'
+import {User, userRole, userState} from '../../../models/user';
 
 export default class userController {
     private rep = new Repository;
 
-    public login() : express.RequestHandler {
+    public getUser() : express.RequestHandler {
         return async (req: express.Request, res: express.Response) => {
-            console.log(req.body);
             let respond : apiResponse ;
-            if (req.body && req.body.email && req.body.password){
-                let user : UserInterface = {email: req.body.email, password: req.body.password} ;
+            if (req.body){
+                let user : User = req.body as User ;
                 let result = await this.rep.getUser(user);
                 if (result) {
                     respond = { Success: true, Data: result };
@@ -29,23 +28,62 @@ export default class userController {
         } 
     }
     
-    public signup() : express.RequestHandler {
+    public createUser() : express.RequestHandler {
         return async (req: express.Request, res: express.Response) => {
-            console.log(req.body);
             let respond : apiResponse ;
-            if (req.body && req.body.email && req.body.password){
-                let user : UserInterface = {
-                    email: req.body.email, 
-                    password: req.body.password, 
-                    userState: userState.NotApproved,
-                    userRole: [userRole.Viewer]
-                };
+            if (req.body){
+                let user : User = req.body as User;
                 let result = await this.rep.createUser(user);
                 if (result) {
-                    respond = { Success: true, Data: result, Errors: [] };
+                    respond = { Success: true, Data: result };
                     res.status(200);
                 } else {
-                    respond = { Success: false, Errors: [] };
+                    respond = { Success: false, Errors: ['Request failed.'] };
+                    res.status(500);
+                }
+            } else {
+                respond = { Success: false, Errors: ['Request Denied.'] };
+                res.status(400);
+            }
+            res.json(respond);
+            res.end();
+        } 
+    }
+
+    public updateUser() : express.RequestHandler {
+        return async (req: express.Request, res: express.Response) => {
+            let respond : apiResponse ;
+            if (req.body && req.body.user && req.body.update){
+                let user : User = req.body.user as User;
+                let userupdate : User = req.body.update as User;
+                let result = await this.rep.updateUser(user, userupdate);
+                if (result) {
+                    respond = { Success: true, Data: result };
+                    res.status(200);
+                } else {
+                    respond = { Success: false, Errors: ['Request failed.'] };
+                    res.status(500);
+                }
+            } else {
+                respond = { Success: false, Errors: ['Request Denied.'] };
+                res.status(400);
+            }
+            res.json(respond);
+            res.end();
+        } 
+    }
+
+    public deleteUser() : express.RequestHandler {
+        return async (req: express.Request, res: express.Response) => {
+            let respond : apiResponse ;
+            if (req.body){
+                let user : User = req.body as User;
+                let result = await this.rep.deleteUser(user);
+                if (result) {
+                    respond = { Success: true, Data: result };
+                    res.status(200);
+                } else {
+                    respond = { Success: false, Errors: ['Request failed.'] };
                     res.status(500);
                 }
             } else {
@@ -60,7 +98,13 @@ export default class userController {
     public getAllUsersList() : express.RequestHandler {
         return async (req: express.Request, res: express.Response) => {
             let respond : apiResponse ;
-            let result = await this.rep.getAllUsers();
+            let result ;
+            if (req.body) { 
+                result = await this.rep.getAllUsers(req.body);
+            } else {
+                result = await this.rep.getAllUsers();
+            }
+
             if (result) {
                 respond = { Success: true, Data: result };
                 res.status(200);
@@ -68,6 +112,7 @@ export default class userController {
                 respond = { Success: false, Errors: ['User not found.'] };
                 res.status(500);
             }
+            
             res.json(respond);
             res.end();
         } 

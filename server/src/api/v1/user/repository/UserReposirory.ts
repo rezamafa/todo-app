@@ -1,6 +1,6 @@
 import {MongoHelper} from "../../../database/mongoHelper";
 import {dbConfig} from '../../../config/dbConfig'
-import {UserInterface} from '../../../interfaces/user'
+import {User} from '../../../models/user'
 
 
 export default class UserRepository {
@@ -9,15 +9,27 @@ export default class UserRepository {
         return MongoHelper.client.db(dbConfig.dbName).collection('user');
     }
 
-    public async getUser(user: UserInterface) {
-        return this.getCollection().findOne(user) as UserInterface;
+    public async getUser(user: User) {
+        return await this.getCollection().findOne(user) as User;
     }
 
-    public async createUser(user: UserInterface) {
-        return this.getCollection().insertOne(user);
+    public async createUser(user: User) {
+        return await this.getCollection().insertOne(user);
     }
 
-    public async getAllUsers() {
-        return await this.getCollection().find().toArray() as UserInterface[];
+    public async updateUser(filter: User, update: User) {
+        return await this.getCollection().updateOne(filter, {$set: update});
+    }
+
+    public async deleteUser(filter: User) {
+        return await this.getCollection().deleteOne(filter)
+    }
+
+    public async getAllUsers(filter?: User) {
+        if (filter) {
+            return await this.getCollection().find(filter).toArray() as User[];
+        } else {
+            return await this.getCollection().find().toArray() as User[];
+        }
     }
 }

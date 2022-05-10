@@ -18,7 +18,7 @@ export enum userRole {
     ContentManager = 'ContentManager',
     Viewer = 'Viewer'    
 };
-export interface UserInterface { 
+export interface User { 
     _id?: ObjectId,
     email?: string,
     phoneNumber?: string, 
