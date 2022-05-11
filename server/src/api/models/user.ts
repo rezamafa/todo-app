@@ -24,8 +24,7 @@ export interface User {
     phoneNumber?: string, 
     username?: string,
     password?: string, 
-    gender?: string,
-    salt?: string, 
+    gender?: string, 
     userRole?: userRole[], 
     userState?: userState, 
     verifyCode?: any
