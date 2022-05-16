@@ -1,14 +1,21 @@
 import React, {Component} from 'react';
 import ReactDOM from 'react-dom/client';
-import './index.css';
-//import App from './App';
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import {Layout, Home, NoPage, About, Login} from './pages'
 
 class App extends Component{
   render(): React.ReactNode {
     return(
-      <div className="App">
-       <h1>REACT NATIVE APP</h1>
-      </div>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<Layout />}>
+            <Route index element={<Home />} />
+            <Route path="about" element={<About />} />
+            <Route path="login" element={<Login />} />
+            <Route path="*" element={<NoPage />} />
+          </Route>
+        </Routes>
+    </BrowserRouter>
     );
   }
 }

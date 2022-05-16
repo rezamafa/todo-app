@@ -1,0 +1,7 @@
+{
+    "editor.smoothScrolling": true,
+    "editor.mouseWheelScrollSensitivity": 0.01,
+    "workbench.list.mouseWheelScrollSensitivity": 0.01,
+    "workbench.list.smoothScrolling": true,
+    "terminal.integrated.mouseWheelScrollSensitivity": 0.01
+}
