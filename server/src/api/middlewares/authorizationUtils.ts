@@ -4,7 +4,7 @@ import {authConfig} from '../config/authConfig'
 import { User } from "../models/user";
 
 
-export default class SecurityUtils {
+export default class AuthorizationUtils {
 
     public static async jwtSign(user: User) {
         try {

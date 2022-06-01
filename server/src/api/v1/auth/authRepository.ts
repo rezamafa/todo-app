@@ -1,10 +1,9 @@
-import {MongoHelper} from "../../../database/mongoHelper";
-import {dbConfig} from '../../../config/dbConfig'
-import {User} from '../../../models/user'
-import { NewUser } from "../../../models/auth";
+import {MongoHelper} from "../../database/mongoHelper";
+import {dbConfig} from '../../config/dbConfig'
+import {User} from '../../models/user'
 
 
-export default class authRepository {
+export default class AuthRepository {
 
     private getCollection = () => {
         return MongoHelper.client.db(dbConfig.dbName).collection('user');
@@ -18,8 +17,8 @@ export default class authRepository {
         return this.getCollection().insertOne(user);
     }
 
-    public async ifUserExist(newUser: any) {
-        let checkEmail  = await this.getCollection().find({email: newUser.email}).toArray();
+    public async ifUserExist(userEmail: string) {
+        let checkEmail  = await this.getCollection().find({email: userEmail}).toArray();
         if (checkEmail.length > 0) {return true} else {return false}
     }
 }

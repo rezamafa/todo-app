@@ -1,0 +1,28 @@
+.divMain {
+  padding-top: 3em;
+}
+
+.loginForm {
+  background-color: #292f3c;
+  padding: 1em;
+  width: 95%;
+  max-width: 500px;
+  margin: auto;
+  border: 3px solid gray;
+  border-radius: 10px;
+  text-align: left;
+}
+.pForm {
+  padding: 0px;
+  margin: 0px;
+  font-size: small;
+}
+
+.buttonLogin{
+  text-align: right;
+}
+.divider {
+  margin-top: 10px;
+  border-top: 1px solid gray;
+  height: 5px;
+}
