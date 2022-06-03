@@ -5,6 +5,8 @@
     text-align: center;
     justify-content: center;
     color: white;
-    padding: 0px;
+    padding: 0px !important;
+    margin: 0px !important;
+    width: 100vW;
   }
   

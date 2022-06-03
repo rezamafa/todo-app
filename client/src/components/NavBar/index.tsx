@@ -3,57 +3,47 @@ import Navbar from "react-bootstrap/Navbar";
 import Nav from "react-bootstrap/Nav";
 import {Dropdown} from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
-
-/*
-                  <NavDropdown
-                    id="collasible-nav-dropdown"
-                    key={navItemCount}
-                    title={navItem.title}
-                  >
-                    {navItem.dropDown.map((dropDownItem) => {
-                      navItemCount += 1;
-                      return (
-                        <NavDropdown.Item
-                          style={{backgroundColor: 'rgba(var(--bs-dark-rgb),var(--bs-bg-opacity))',color: 'white'}}
-                          key={navItemCount}
-                          as={Link}
-                          to={"/" + dropDownItem.route}
-                        >
-                          {dropDownItem.title}
-                        </NavDropdown.Item>
-                      );
-                    })}
-                  </NavDropdown>
-*/
-
+import { useState } from "react";
 
 interface MenuItemsInterface {
   items: [
     {
+      key: number;
       title: string;
       route: string;
       dropDown?: [
-        {
+        {  
+          key: number;
           title: string;
           route: string;
         }
       ];
     }
-  ],
-  userInfo?: {
-    email?: string
-  }
+  ]
 }
 
-function UserLoggedIn (props: MenuItemsInterface) {
+function ShowUserInfo (props: {userInfo: {email?: string}, setUserInfo: any}) {
+  let auth = localStorage.getItem('auth');
   const navigate = useNavigate();
-  if (props.userInfo && props.userInfo.email) {
-    return (
-      <>
-        <Nav.Link as={Link} to={"/user"}> Login as: {props.userInfo.email} </Nav.Link>
-        <Nav.Link as={Link} to={"/"} onClick={(e) => {navigate('/', {replace: true})}}> ( Logout ) </Nav.Link>
-      </>
-    )
+
+  const handleLogout = () => {
+    localStorage.clear();
+    navigate('/', {replace: true});
+    props.setUserInfo({});
+  }
+
+  if (auth && auth.length > 0) {
+    if (props.userInfo && props.userInfo.email) {
+      return (
+        <>
+          <Nav.Link as={Link} to={"/user"}> Login as: {props.userInfo.email} </Nav.Link>
+          <Nav.Link as={Link} to={"/"} onClick={handleLogout}> ( Logout ) </Nav.Link>
+        </>
+      )
+    } else {
+      props.setUserInfo( {email: 'mafa@gmail.com'});
+      return (<Nav.Link as={Link} to={"/"} onClick={handleLogout}> ( Logout ) </Nav.Link>)
+    }
   } else {
     return (
       <Nav.Link as={Link} to={"/login"}> Login </Nav.Link>
@@ -63,7 +53,7 @@ function UserLoggedIn (props: MenuItemsInterface) {
 }
 
 function NavBar(props: MenuItemsInterface) {
-  let navItemCount = 0;
+  const [userInfo , setUserInfo] = useState({})
   return (
     <Navbar bg="dark" variant={"dark"} expand="lg">
       <Container>
@@ -75,15 +65,13 @@ function NavBar(props: MenuItemsInterface) {
           <Nav className="me-auto">
             {props.items.map((navItem) => {
               if (navItem.dropDown && navItem.dropDown.length >= 1) {
-                navItemCount += 1;
                 return (
                   <Dropdown>
                     <Dropdown.Toggle variant="dark">{navItem.title}</Dropdown.Toggle>
                     <Dropdown.Menu variant="dark">
                       {navItem.dropDown.map((dropDownItem) => {
-                        navItemCount += 1;
                         return (
-                          <Dropdown.Item key={navItemCount} as={Link} to={"/" + dropDownItem.route} >
+                          <Dropdown.Item key={dropDownItem.key} as={Link} to={"/" + dropDownItem.route} >
                            {dropDownItem.title}
                           </Dropdown.Item>
                         );
@@ -92,10 +80,9 @@ function NavBar(props: MenuItemsInterface) {
                   </Dropdown>
                 );
               } else {
-                navItemCount += 1;
                 return (
                   <Nav.Link
-                    key={navItemCount}
+                    key={navItem.key}
                     as={Link}
                     to={"/" + navItem.route}
                   >
@@ -106,7 +93,7 @@ function NavBar(props: MenuItemsInterface) {
             })}
           </Nav>
           <Nav>
-            <UserLoggedIn items={props.items} userInfo={props.userInfo}></UserLoggedIn>
+            <ShowUserInfo userInfo={userInfo} setUserInfo={setUserInfo}/>
           </Nav>
         </Navbar.Collapse>
       </Container>

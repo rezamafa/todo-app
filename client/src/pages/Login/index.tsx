@@ -1,4 +1,4 @@
-import styles from "./loginStyle.module.scss";
+import styles from "./loginStyle.module.css";
 import Container from "react-bootstrap/Container";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
@@ -20,8 +20,8 @@ function Login() {
         setMsg(res.Errors + ' Email or Password is increact!  ');
         return 
       } 
-      setMsg('Login Successfuly.');
       localStorage.setItem('auth', res.Data.token);
+      setMsg('Login Successfuly.');
       navigate('/', {replace: true})
     });
   }

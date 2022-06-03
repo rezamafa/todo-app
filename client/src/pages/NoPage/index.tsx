@@ -1,4 +1,4 @@
-import styles from './noPageStyle.module.scss';
+import styles from './noPageStyle.module.css';
 import mc from 'classnames';
 import Container from "react-bootstrap/Container";
 
