@@ -16,17 +16,14 @@ export default class AuthorizationUtils {
         }
     }
 
-    public static jwtDecode(token: string) {
-        return new Promise((resolve, reject) => {
-            jwt.verify(token, authConfig.secret, (err, decoded) => {
-                if (decoded) {
-                    resolve(decoded)
-                } else {
-                    reject(new Error('Decode have some problems'));
-                }
-            });
-
-        });
+    public static async jwtDecode(token: string) {
+        try {
+            let user = await jwt.verify(token, authConfig.secret);
+            return user;
+        } catch (err) {
+            console.log('Decode have some problems : ', err)
+            return null;
+        }
     }
 
     public static async hashPassword(password: string) {

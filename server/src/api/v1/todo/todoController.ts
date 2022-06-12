@@ -1,80 +1,84 @@
 import express from "express";
-import Repository from './todoReposirory';
-import {apiResponse} from '../../models/expressModels'
-import {User} from '../../models/user';
+import Repository from "./todoReposirory";
+import { apiResponse } from "../../models/expressModels";
+import { User } from "../../models/user";
 import { TodoList, TodoItem } from "../../models/todoList";
+import ExpressHelper from "../../middlewares/expressRespondHelper";
+import AuthorizationUtils from "../../middlewares/authorizationUtils";
+import { ObjectId } from "mongodb";
 
 export default class TodoListController {
-    
-    private rep = new Repository;
+  private rep = new Repository();
 
-    public get() : express.RequestHandler {
-        return async (req: express.Request, res: express.Response) => {
-            if (!req.body || !req.body._id) return res.status(400).json(<apiResponse>{ Success: false, Errors: ['Request Denied.'] });
+  public get(): express.RequestHandler {
+    return async (req: express.Request, res: express.Response) => {
+      if (!req || !req.params || !req.params.id) return ExpressHelper.send(res, 400, false, null, ["Request Denied."]);
 
-            let todoList : TodoList = req.body as TodoList ;
+      if (!req.headers || !req.headers.auth) return ExpressHelper.send(res, 400, false, null, ["Request Denied."]);
+      let user: User = (await AuthorizationUtils.jwtDecode( req.headers.auth as string )) as User;
+      if (!user || !user._id) return ExpressHelper.send(res, 403, false, null, ["Access Denied."]);
 
-            let result = await this.rep.get(todoList);
-            if (!result) return res.status(404).json(<apiResponse>{ Success: false, Errors: ['TodoList not found.'] });
+      let result = (req.params.id == "all") ?  await this.rep.get({ user: new ObjectId(user._id) }) : 
+        await this.rep.get({_id: new ObjectId(req.params.id), user: new ObjectId(user._id) });
+      if (!result) return ExpressHelper.send(res, 400, false, null, ["TodoList not found."]);
+      
+      return ExpressHelper.send(res, 200, true, result);
+    };
+  }
 
-            return res.status(200).json(<apiResponse>{ Success: true, Data: result });
-        } 
-    }
+  public create(): express.RequestHandler {
+    return async (req: express.Request, res: express.Response) => {
+      if (!req.body || !req.body.title) return ExpressHelper.send(res, 400, false, null, ["Request Denied."]);
+      let todoList: TodoList = req.body as TodoList;
 
-    public create() : express.RequestHandler {
-        return async (req: express.Request, res: express.Response) => {
-            if (!req.body || !req.body._id) return res.status(400).json(<apiResponse>{ Success: false, Errors: ['Request Denied.'] });
+      if (!req.headers || !req.headers.auth) return ExpressHelper.send(res, 400, false, null, ["Request Denied."]);
+      let user: User = (await AuthorizationUtils.jwtDecode( req.headers.auth as string )) as User;
+      if (!user || !user._id) return ExpressHelper.send(res, 403, false, null, ["Access Denied."]);
+      todoList.user = new ObjectId(user._id);
+      todoList.createdOn = new Date();
 
-            let todoList : TodoList = req.body as TodoList ;
+      let result = await this.rep.create(todoList);
+      if (!result || !result.acknowledged || !result.insertedId)
+        return ExpressHelper.send(res, 500, false, null, ["Request Failed."]);
 
-            let result = await this.rep.create(todoList);
-            if (!result) return res.status(500).json(<apiResponse>{ Success: false, Errors: ['TodoList failed.'] });
+      return ExpressHelper.send(res, 200, true, result);
+    };
+  }
 
-            return res.status(200).json(<apiResponse>{ Success: true, Data: result });
-        } 
-    }
+  public update(): express.RequestHandler {
+    return async (req: express.Request, res: express.Response) => {
+      if (!req.body || !req.body._id || !req.body.title || !req.body.todoItems || !req.body.user )
+        return ExpressHelper.send(res, 400, false, null, ["Request Denied."]);
 
-    public update() : express.RequestHandler {
-        return async (req: express.Request, res: express.Response) => {
-            if (!req.body || !req.body.todoList || !req.body.todoListUpdate) {
-                return res.status(400).json(<apiResponse>{ Success: false, Errors: ['Request Denied.'] });
-            }
+      if (!req.headers || !req.headers.auth) return ExpressHelper.send(res, 400, false, null, ["Request Denied."]);
+      let user: User = (await AuthorizationUtils.jwtDecode( req.headers.auth as string )) as User;
+      if (!user || !user._id)  return ExpressHelper.send(res, 403, false, null, ["Access Denied."]);
+      if (user._id != req.body.user)  return ExpressHelper.send(res, 403, false, null, ["Access Denied."]);
 
-            let todoList : TodoList = req.body.todoList as TodoList ;
-            let todoListUpdate: TodoList = req.body.todoListUpdate as TodoList
+      let todoList: TodoList = {title: req.body.title, todoItems: req.body.todoItems, modifiedOn: new Date()};
+      let updateFilter: TodoList = {_id: new ObjectId(req.body._id), user: new ObjectId(user._id)};
 
-            let result = await this.rep.update(todoList,todoListUpdate)
-            if (!result) return res.status(500).json(<apiResponse>{ Success: false, Errors: ['Update failed.'] });
+      let result = await this.rep.update(updateFilter, todoList);
+      if (!result || !result.acknowledged || result.modifiedCount < 1)
+        return ExpressHelper.send(res, 500, false, null, ["Request Failed."]);
 
-            return res.status(200).json(<apiResponse>{ Success: true, Data: result });
-        } 
-    }
+      return ExpressHelper.send(res, 200, true, result);
+    };
+  }
 
-    public delete() : express.RequestHandler {
-        return async (req: express.Request, res: express.Response) => {
-            if (!req.body || !req.body._id) return res.status(400).json(<apiResponse>{ Success: false, Errors: ['Request Denied.'] });
+  public delete(): express.RequestHandler {
+    return async (req: express.Request, res: express.Response) => {
+      if (!req || !req.params || !req.params.id) return ExpressHelper.send(res, 400, false, null, ["Request Denied."]);
 
-            let todoList : TodoList = req.body as TodoList ;
+      if (!req.headers || !req.headers.auth) return ExpressHelper.send(res, 400, false, null, ["Request Denied."]);
+      let user: User = (await AuthorizationUtils.jwtDecode( req.headers.auth as string )) as User;
+      if (!user || !user._id) return ExpressHelper.send(res, 403, false, null, ["Access Denied."]);
 
-            let result = await this.rep.delete(todoList);
-            if (!result) return res.status(500).json(<apiResponse>{ Success: false, Errors: ['Request failed.'] });
+      let result = await this.rep.delete({ _id: new ObjectId(req.params.id), user: new ObjectId(user._id) });
+      if (!result || !result.acknowledged || result.deletedCount < 1) 
+        return ExpressHelper.send(res, 500, false, null, ["Request Failed."]);
 
-            return res.status(200).json(<apiResponse>{ Success: true, Data: result });
-        } 
-    }
-
-    public getAll() : express.RequestHandler {
-        return async (req: express.Request, res: express.Response) => {
-            if (!req.body || !req.body.user || !req.body.user._id) {
-                return res.status(400).json(<apiResponse>{ Success: false, Errors: ['Request Denied.'] });
-            }
-
-            let todoListByUser : TodoList = req.body as TodoList ;
-
-            let result = await this.rep.getAll(todoListByUser);
-            if (!result) return res.status(500).json(<apiResponse>{ Success: false, Errors: ['Request failed.'] });
-
-            return res.status(200).json(<apiResponse>{ Success: true, Data: result });
-        } 
-    }
+      return ExpressHelper.send(res, 200, true, result);
+    };
+  }
 }

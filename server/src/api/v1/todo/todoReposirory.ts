@@ -11,7 +11,7 @@ export default class TodoRepository {
     }
 
     public async get(filter: TodoList) {
-        return await this.getCollection().findOne(filter) as TodoList;
+        return await this.getCollection().find(filter).toArray() as TodoList[];
     }
 
     public async create(todoList: TodoList) {
@@ -24,9 +24,5 @@ export default class TodoRepository {
 
     public async delete(filter: TodoList) {
         return await this.getCollection().deleteOne(filter)
-    }
-
-    public async getAll(filter: TodoList) {
-        return await this.getCollection().find(filter).toArray() as TodoList[];
     }
 }

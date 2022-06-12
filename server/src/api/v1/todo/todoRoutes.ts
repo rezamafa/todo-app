@@ -4,10 +4,9 @@ import TodoController from "./todoController";
 let routes = express.Router();
 let controller = new TodoController();
 
-routes.get('/', controller.get());
-routes.put('/', controller.create());
-routes.post('/', controller.update());
-routes.delete('/', controller.delete());
-routes.get('/all', controller.getAll());
+routes.get('/:id', controller.get());
+routes.post('/', controller.create());
+routes.put('/', controller.update());
+routes.delete('/:id', controller.delete());
 
 export default routes;

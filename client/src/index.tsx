@@ -1,6 +1,6 @@
 import ReactDOM from "react-dom/client";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { Layout, Home, TodoList, NoPage, About, Login } from "./pages";
+import { Layout, Home, TodoList, NoPage, About, Login, Register } from "./pages";
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 function App() {
@@ -12,6 +12,7 @@ function App() {
           <Route path="todolist" element={<TodoList />} />
           <Route path="about" element={<About />} />
           <Route path="login" element={<Login />} />
+          <Route path="register" element={<Register />} />
           <Route path="*" element={<NoPage />} />
         </Route>
       </Routes>

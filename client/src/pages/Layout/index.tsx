@@ -2,7 +2,7 @@ import { useState } from "react";
 import Container from "react-bootstrap/Container";
 import { Outlet } from "react-router-dom";
 import NavBar from "../../components/NavBar";
-import "./layout.css";
+import "./style.css";
 
 let navBarItems:any = [
   {
