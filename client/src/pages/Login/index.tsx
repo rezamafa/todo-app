@@ -5,7 +5,7 @@ import Button from "react-bootstrap/Button";
 import DataServices from '../../services/dataServices';
 import { useState } from "react";
 import { ApiRespond } from "../../models/apiRequestModels";
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 function Login() {
   const [email, setEmail] = useState("");
@@ -50,10 +50,9 @@ function Login() {
           </div>
 
           <div className={styles.divider}></div>
-          <p className={styles.pForm}>Forget your Password? click here.</p>
-          <p className={styles.pForm}>
-            Don't have any account? go to register page.
-          </p>
+
+          <p><Link to="/forgot-password" className={styles.pForm}  >Forget your Password? click here.</Link></p>
+          <p><Link to="/register" className={styles.pForm}  >Don't have any account? go to register page.</Link></p>
         </Form>
     </Container>
   );

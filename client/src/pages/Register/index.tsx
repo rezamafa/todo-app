@@ -18,6 +18,11 @@ function Register() {
 
   const handleSubmit = (event: any) => {
     event.preventDefault();
+    if (password !== passwordRepeat) {
+      setMsg('  Your repeated password is increact!  ');
+      return ;
+    }
+
     DataServices.register({email: email, password: password, phoneNumber: phoneNumber, gender: gender}).then((res: ApiRespond) => {
       if (!res.Success || !res.Data || !res.Data.token || !res.Data.email) {
         setMsg(res.Errors + ' Email or Password is increact!  ');
@@ -25,7 +30,7 @@ function Register() {
       } 
       localStorage.setItem('auth', res.Data.token);
       localStorage.setItem('email', res.Data.email);
-      setMsg('Login Successfuly.');
+      setMsg('Register Successfuly.');
       navigate('/', {replace: true})
     });
   }
@@ -44,7 +49,7 @@ function Register() {
             <Form.Control type="password" placeholder="Password" onChange={(e:any) => setPassword(e.target.value)}/>
           </Form.Group>
           
-          <Form.Group className="mb-3" controlId="formBasicPassword">
+          <Form.Group className="mb-3" >
             <Form.Label>Repeat Password</Form.Label>
             <Form.Control type="password" placeholder="Repeat Password" onChange={(e:any) => setPasswordRepeat(e.target.value)}/>
           </Form.Group>
@@ -68,7 +73,7 @@ function Register() {
           </div>
 
           <div className={styles.divider}></div>
-          <Link to="/register" className={styles.pForm} >Already have an account? Login from here.</Link>
+          <Link to="/login" className={styles.pForm} >Already have an account? Login from here.</Link>
         </Form>
     </Container>
   );
